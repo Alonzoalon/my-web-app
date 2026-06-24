@@ -10,20 +10,23 @@ const PORT = process.env.PORT || 8888;
 
 app.set("view engine", "ejs");
 app.set("views", "./views");
-// フォームから送られてきたデータを受け取れるようにする設定
 app.use(express.urlencoded({ extended: true }));
 
-// 一覧画面を表示する
 app.get("/", async (req, res) => {
   const users = await prisma.user.findMany();
   res.render("index", { users });
 });
 
-// ユーザーを追加する
 app.post("/users", async (req, res) => {
   const name = req.body.name;
+  const ageStr = req.body.age;
+  // 年齢が入力されていたら数値に変え、空なら null にする
+  const age = ageStr ? parseInt(ageStr) : null;
+
   if (name) {
-    await prisma.user.create({ data: { name } });
+    await prisma.user.create({
+      data: { name, age },
+    });
   }
   res.redirect("/");
 });
